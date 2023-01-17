@@ -19,7 +19,8 @@ install_data('bbswitchd.socket',
     install_dir : systemd_system_unit_dir
 )
 
-install_data(['99-bbswitchd-nvidia-dev.rules'],
+install_data(['bbswitchd-nvidia-dev.rules'],
+    rename : '90-bbswitchd-nvidia-dev.rules',
     install_dir : get_option('prefix') / 'lib/udev/rules.d'
 )
 
