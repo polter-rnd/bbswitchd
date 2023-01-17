@@ -29,11 +29,11 @@ install_data('bbswitchd.preset',
     install_dir : systemd_system_preset_dir
 )
 
-install_data(['bbswitchd-nvidia-dev.rules'],
-    rename : '90-bbswitchd-nvidia-dev.rules',
+install_data(['bbswitchd-nvidia-mutter.rules', 'bbswitchd-nvidia-dev.rules'],
+    rename : ['60-bbswitchd-nvidia-mutter.rules', '90-bbswitchd-nvidia-dev.rules'],
     install_dir : get_option('prefix') / 'lib/udev/rules.d'
 )
 
-install_data(['bbswitchd-blacklist.conf'],
+install_data('bbswitchd-blacklist.conf',
     install_dir : get_option('prefix') / 'lib/modprobe.d'
 )
