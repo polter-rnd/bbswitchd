@@ -6,6 +6,7 @@ project('bbswitchd',
 
 # Required parts
 subdir('src')
+subdir('data')
 
 # Script for comminucating with daemon
 install_data('bbswitch',

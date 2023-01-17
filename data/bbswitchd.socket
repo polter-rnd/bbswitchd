@@ -1,0 +1,10 @@
+[Unit]
+Description=Socket for bbswitchd daemon
+
+[Socket]
+ListenDatagram=%t/bbswitchd.sock
+SocketGroup=bbswitchd
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=GPU power state management daemon
+
+[Service]
+Type=simple
+ExecStart=@SBINDIR@/bbswitchd --log=syslog --fd=3
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
