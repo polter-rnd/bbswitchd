@@ -2,7 +2,7 @@
 
 ########################################
 ## <summary>
-##	Execute bbswitchd in the bbswitchd domain.
+##	Execute bbswitchd_exec_t in the bbswitchd domain.
 ## </summary>
 ## <param name="domain">
 ## <summary>
@@ -36,31 +36,6 @@ interface(`bbswitchd_read_pid_files',`
 
 	files_search_pids($1)
 	read_files_pattern($1, bbswitchd_var_run_t, bbswitchd_var_run_t)
-')
-
-########################################
-## <summary>
-##	Execute bbswitchd server in the bbswitchd domain.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed to transition.
-##	</summary>
-## </param>
-#
-interface(`bbswitchd_systemctl',`
-	gen_require(`
-		type bbswitchd_t;
-		type bbswitchd_unit_file_t;
-	')
-
-	systemd_exec_systemctl($1)
-	init_reload_services($1)
-    systemd_read_fifo_file_passwd_run($1)
-	allow $1 bbswitchd_unit_file_t:file read_file_perms;
-	allow $1 bbswitchd_unit_file_t:service manage_service_perms;
-
-	ps_process_pattern($1, bbswitchd_t)
 ')
 
 ########################################
