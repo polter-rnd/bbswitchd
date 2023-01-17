@@ -19,6 +19,16 @@ install_data('bbswitchd.socket',
     install_dir : systemd_system_unit_dir
 )
 
+systemd_system_preset_dir = systemd.get_variable(
+    pkgconfig : 'systemdsystempresetdir',
+    pkgconfig_define : ['rootprefix', get_option('prefix')]
+)
+
+install_data('bbswitchd.preset',
+    rename : '90-bbswitchd.preset',
+    install_dir : systemd_system_preset_dir
+)
+
 install_data(['bbswitchd-nvidia-dev.rules'],
     rename : '90-bbswitchd-nvidia-dev.rules',
     install_dir : get_option('prefix') / 'lib/udev/rules.d'
