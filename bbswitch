@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# Copyright (c) 2022-2023, Pavel Artsishevsky
+# Author: Pavel Artsishevsky <polter.rnd@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Utility to turn dedicated NVIDIA GPU on/off using bbswitchd daemon."""
+
+import socket
+import sys
+
+# Path to bbswitchd socket
+BBSWITCHD_SOCK = '/var/run/bbswitchd.sock'
+
+
+def usage():
+    """Prine usage information.
+
+    :return: Returns program exit code: `1`
+    """
+    print('Usage: bbswitch on | off', file=sys.stderr)
+    return 1
+
+
+def switch_power_state(state: str):
+    """Set dedicated GPU power state (turn on/off).
+
+    :param state: `on` means GPU will be enabled, `off` - disabled.
+    :return: Returns program exit code: `0` on success, otherwise `1`
+    """
+    try:
+        client = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        client.bind('')
+        client.sendto(state.encode('ascii') + b'\0', BBSWITCHD_SOCK)
+        response, _ = client.recvfrom(1024)
+        if response != b'\0':
+            print(response.decode(), file=sys.stderr)
+            return 1
+    except OSError as err:
+        print(err, file=sys.stderr)
+        return 1
+    finally:
+        client.close()
+    return 0
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2 or sys.argv[1] not in ['on', 'off']:
+        sys.exit(usage())
+
+    sys.exit(switch_power_state(sys.argv[1]))

@@ -1,0 +1,12 @@
+# C artifacts
+src/*.[od]
+src/bbswitchd
+
+# Clangd cache
+.cache/
+
+# IDE project files
+.vscode/
+.idea/
+*.sublime-workspace
+*.code-workspace
