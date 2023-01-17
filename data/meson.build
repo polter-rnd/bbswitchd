@@ -19,12 +19,10 @@ install_data('bbswitchd.socket',
     install_dir : systemd_system_unit_dir
 )
 
-udev = dependency('udev')
-udev_dir = udev.get_variable(
-    pkgconfig : 'udevdir',
-    pkgconfig_define : ['rootprefix', get_option('prefix')]
+install_data(['99-bbswitchd-nvidia-dev.rules'],
+    install_dir : get_option('prefix') / 'lib/udev/rules.d'
 )
 
-install_data(['99-bbswitchd-nvidia-dev.rules'],
-    install_dir : udev_dir / 'rules.d'
+install_data(['bbswitchd-blacklist.conf'],
+    install_dir : get_option('prefix') / 'lib/modprobe.d'
 )
