@@ -1,0 +1,2 @@
+/usr/sbin/bbswitchd  -- gen_context(system_u:object_r:bbswitchd_exec_t,s0)
+/var/run/bbswitchd.*    gen_context(system_u:object_r:bbswitchd_var_run_t,s0)

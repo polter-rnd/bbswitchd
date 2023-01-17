@@ -1,0 +1,122 @@
+## <summary>policy for bbswitchd</summary>
+
+########################################
+## <summary>
+##	Execute bbswitchd in the bbswitchd domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`bbswitchd_domtrans',`
+	gen_require(`
+		type bbswitchd_t, bbswitchd_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, bbswitchd_exec_t, bbswitchd_t)
+')
+
+########################################
+## <summary>
+##	Read bbswitchd PID files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`bbswitchd_read_pid_files',`
+	gen_require(`
+		type bbswitchd_var_run_t;
+	')
+
+	files_search_pids($1)
+	read_files_pattern($1, bbswitchd_var_run_t, bbswitchd_var_run_t)
+')
+
+########################################
+## <summary>
+##	Execute bbswitchd server in the bbswitchd domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`bbswitchd_systemctl',`
+	gen_require(`
+		type bbswitchd_t;
+		type bbswitchd_unit_file_t;
+	')
+
+	systemd_exec_systemctl($1)
+	init_reload_services($1)
+    systemd_read_fifo_file_passwd_run($1)
+	allow $1 bbswitchd_unit_file_t:file read_file_perms;
+	allow $1 bbswitchd_unit_file_t:service manage_service_perms;
+
+	ps_process_pattern($1, bbswitchd_t)
+')
+
+########################################
+## <summary>
+##	Connect to bbswitchd over a unix stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`bbswitchd_dgram_send',`
+	gen_require(`
+		type bbswitchd_t, bbswitchd_var_run_t;
+	')
+
+	files_search_pids($1)
+	dgram_send_pattern($1, bbswitchd_var_run_t, bbswitchd_var_run_t, bbswitchd_t)
+')
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	an bbswitchd environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`bbswitchd_admin',`
+	gen_require(`
+		type bbswitchd_t;
+		type bbswitchd_var_run_t;
+		type bbswitchd_unit_file_t;
+	')
+
+	allow $1 bbswitchd_t:process { signal_perms };
+	ps_process_pattern($1, bbswitchd_t)
+
+    tunable_policy(`deny_ptrace',`',`
+        allow $1 bbswitchd_t:process ptrace;
+    ')
+
+	files_search_pids($1)
+	admin_pattern($1, bbswitchd_var_run_t)
+
+	bbswitchd_systemctl($1)
+	admin_pattern($1, bbswitchd_unit_file_t)
+	allow $1 bbswitchd_unit_file_t:service all_service_perms;
+
+	optional_policy(`
+		systemd_passwd_agent_exec($1)
+		systemd_read_fifo_file_passwd_run($1)
+	')
+')

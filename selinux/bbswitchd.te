@@ -1,0 +1,51 @@
+policy_module(bbswitchd, 1.0.0)
+
+gen_require(`
+    type modules_conf_t;
+    type modules_dep_t;
+')
+
+########################################
+#
+# Declarations
+#
+
+type bbswitchd_t;
+type bbswitchd_exec_t;
+init_daemon_domain(bbswitchd_t, bbswitchd_exec_t)
+
+type bbswitchd_var_run_t;
+files_pid_file(bbswitchd_var_run_t)
+
+type bbswitchd_unit_file_t;
+systemd_unit_file(bbswitchd_unit_file_t)
+
+########################################
+#
+# bbswitchd local policy
+#
+
+allow bbswitchd_t self:capability { setgid };
+allow bbswitchd_t self:process { fork signal_perms };
+allow bbswitchd_t self:unix_stream_socket create_stream_socket_perms;
+allow bbswitchd_t self:system module_load;
+
+manage_dirs_pattern(bbswitchd_t, bbswitchd_var_run_t, bbswitchd_var_run_t)
+manage_files_pattern(bbswitchd_t, bbswitchd_var_run_t, bbswitchd_var_run_t)
+manage_sock_files_pattern(bbswitchd_t, bbswitchd_var_run_t, bbswitchd_var_run_t)
+manage_lnk_files_pattern(bbswitchd_t, bbswitchd_var_run_t, bbswitchd_var_run_t)
+files_pid_filetrans(bbswitchd_t, bbswitchd_var_run_t, { dir file lnk_file sock_file })
+
+logging_send_syslog_msg(bbswitchd_t)
+
+# Allow writing to /proc/acpi/bbswitch
+kernel_write_proc_files(bbswitchd_t)
+
+# Read module config and dependency information
+list_dirs_pattern(bbswitchd_t, modules_conf_t, modules_conf_t)
+read_files_pattern(bbswitchd_t, modules_conf_t, modules_conf_t)
+read_files_pattern(bbswitchd_t, modules_dep_t, modules_dep_t)
+
+# Allow load kernel modules
+kernel_load_unsigned_module(bbswitchd_t)
+files_map_kernel_modules(bbswitchd_t)

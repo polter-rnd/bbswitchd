@@ -8,6 +8,11 @@ project('bbswitchd',
 subdir('src')
 subdir('data')
 
+# Build SELinux module if needed
+if get_option('selinux').enabled()
+    subdir('selinux')
+endif
+
 # Script for comminucating with daemon
 install_data('bbswitch',
              install_mode : 'rwxr-xr-x',
