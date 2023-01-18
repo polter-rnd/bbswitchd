@@ -66,7 +66,6 @@ int log_open(enum log_type type, const char *name) {
 static void log_vprint(int level, char *msg_format, va_list args) {
     struct timespec tp;
     const char *level_name;
-    char fullmsg_fmt[32]; /* Should be enough to store log prefix */
 
     switch (S_type) {
     case LOGGER_SYSLOG:
@@ -90,14 +89,14 @@ static void log_vprint(int level, char *msg_format, va_list args) {
         }
 
         clock_gettime(CLOCK_MONOTONIC, &tp);
-        snprintf(fullmsg_fmt, sizeof(fullmsg_fmt), 
-            "[%5llu.%06lu] %s ",
-            (long long) tp.tv_sec, tp.tv_nsec / 1000,
-            level_name);
-        strncat(fullmsg_fmt, msg_format, sizeof(fullmsg_fmt) - 1);
 
-        vfprintf(S_file, fullmsg_fmt, args);
+        fprintf(S_file, "[%5llu.%06lu] %s ",
+                (unsigned long long) tp.tv_sec,
+                (unsigned long) tp.tv_nsec / 1000,
+                level_name);
+        vfprintf(S_file, msg_format, args);
         fflush(S_file);
+
         break;
     }
 }
