@@ -156,6 +156,12 @@ static int switch_and_load(const char **errmsg)
     struct pci_bus_id bus_id;
     char driver[sizeof(NVIDIA_DRIVER)];
 
+    if (!bbswitch_is_available()) {
+        *errmsg = "No bbswitch module available";
+        log_err("%s\n", *errmsg);
+        return -1;
+    }
+
     bbswitch_on();
     if (bbswitch_status(&bus_id) == SWITCH_ON) {
         log_err("Discrete graphics card enabled\n");
@@ -191,6 +197,12 @@ static int switch_and_unload(const char **errmsg)
 {
     struct pci_bus_id bus_id;
     char driver[sizeof(NVIDIA_DRIVER)];
+
+    if (!bbswitch_is_available()) {
+        *errmsg = "No bbswitch module available";
+        log_err("%s\n", *errmsg);
+        return -1;
+    }
 
     if (bbswitch_status(&bus_id) != SWITCH_ON) {
         log_info("Discrete graphics card is already disabled\n");
@@ -257,17 +269,13 @@ int main(int argc, char *argv[]) {
         log_err("Failed to initialize kmod context (errno %d): %s\n",
                 errno, strerror(errno));
     } else {
-        if (bbswitch_is_available()) {
-            server_setup_sighandler();
-            /* 4 is maximum command length since we accept only `on` or `off`. */
-            if (server_listen(S_sockfd, S_sockpath, 4, request_handler) != 0) {
-                log_err("Aborting server.\n");
-            } else {
-                log_close();
-                return EXIT_SUCCESS;
-            }
+        server_setup_sighandler();
+        /* 4 is maximum command length since we accept only `on` or `off`. */
+        if (server_listen(S_sockfd, S_sockpath, 4, request_handler) != 0) {
+            log_err("Aborting server.\n");
         } else {
-            log_err("No switching method available, aborting\n");
+            log_close();
+            return EXIT_SUCCESS;
         }
         module_ctx_release();
     }
