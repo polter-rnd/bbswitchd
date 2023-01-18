@@ -100,7 +100,13 @@ int module_load(const char *module_name, const char *driver) {
         kmod_module_unref_list(list);
     }
 
-    return err == 0 ? 0 : -1;
+    if (err != 0) {
+        log_err("Failed to load module '%s' (errno %d): %s\n",
+                module_name, errno, strerror(errno));
+        return -1;
+    }
+
+    return 0;
 }
 
 /**
@@ -110,7 +116,7 @@ int module_load(const char *module_name, const char *driver) {
  * @return 0 if the module is succesfully unloaded, -1 otherwise
  */
 static int module_unload_recursive(struct kmod_module *mod, int retries, int timeout) {
-    int err = 0, flags = 0, refcnt;
+    int err = 0, flags = 0, refcnt = 0;
     struct kmod_list *holders;
 
     holders = kmod_module_get_holders(mod);
@@ -134,24 +140,30 @@ static int module_unload_recursive(struct kmod_module *mod, int retries, int tim
         if (refcnt == 0) {
             log_info("Unloading module %s\n", kmod_module_get_name(mod));
             err = kmod_module_remove_module(mod, flags);
-            if (err != 0) {
-                log_err("Failed to unload module '%s' (err: %d).\n",
-                        kmod_module_get_name(mod), err);
-            }
         } else if (refcnt != -ENOENT) {
             if (retries > 0) {
                 log_info("Failed to unload module '%s' (ref count: %d). Retrying...\n",
                          kmod_module_get_name(mod), refcnt);
                 sleep(timeout);
             } else {
-                log_err("Failed to unload module '%s' (ref count: %d).\n",
-                        kmod_module_get_name(mod), refcnt);
+                /* Stop retrying when attempt count exceeded */
                 err = -1;
             }
         }
     }
 
-    return err == 0 ? 0 : -1;
+    if (err != 0) {
+        if (refcnt == 0) {
+            log_err("Failed to unload module '%s' (errno %d): %s\n",
+                    kmod_module_get_name(mod), refcnt, errno, strerror(errno));
+        } else {
+            log_err("Failed to unload module '%s' (ref count: %d): Module still in use\n",
+                    kmod_module_get_name(mod), refcnt);
+        }
+        return -1;
+    }
+
+    return 0;
 }
 
 int module_unload(const char *driver, int retries, int timeout) {
