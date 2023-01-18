@@ -163,13 +163,18 @@ static int switch_and_load(const char **errmsg) {
         return -1;
     }
 
-    bbswitch_on();
     if (bbswitch_status(&bus_id) == SWITCH_ON) {
-        log_err("Discrete graphics card enabled\n");
+        log_info("Discrete graphics card is already enabled\n");
+        return 0;
     } else {
-        *errmsg = "Could not enable discrete graphics card";
-        log_err("%s\n", *errmsg);
-        return -1;
+        bbswitch_on();
+        if (bbswitch_status(&bus_id) == SWITCH_ON) {
+            log_info("Discrete graphics card enabled\n");
+        } else {
+            *errmsg = "Could not enable discrete graphics card";
+            log_err("%s\n", *errmsg);
+            return -1;
+        }
     }
 
     if (pci_get_driver(driver, &bus_id, sizeof(driver))) {
