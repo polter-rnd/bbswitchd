@@ -29,22 +29,25 @@ def usage():
 
     :return: Returns program exit code: `1`
     """
-    print('Usage: bbswitch on | off', file=sys.stderr)
+    print('Usage: bbswitch on | off | status', file=sys.stderr)
     return 1
 
 
-def switch_power_state(state: str):
-    """Set dedicated GPU power state (turn on/off).
+def send_command(command: str):
+    """Sends command to bbswitchd daemon and prints response if any.
 
-    :param state: `on` means GPU will be enabled, `off` - disabled.
+    :param command: `on`/`off` to enable or disable GPU,
+                    `status` to get current state.
     :return: Returns program exit code: `0` on success, otherwise `1`
     """
     try:
         client = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
         client.bind('')
-        client.sendto(state.encode('ascii') + b'\0', BBSWITCHD_SOCK)
+        client.sendto(command.encode('ascii') + b'\0', BBSWITCHD_SOCK)
         response, _ = client.recvfrom(1024)
-        if response != b'\0':
+        if command == 'status':
+             print(response.decode())
+        elif response != b'\0':
             print(response.decode(), file=sys.stderr)
             return 1
     except OSError as err:
@@ -56,7 +59,7 @@ def switch_power_state(state: str):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2 or sys.argv[1] not in ['on', 'off']:
+    if len(sys.argv) != 2 or sys.argv[1] not in ['on', 'off', 'status']:
         sys.exit(usage())
 
-    sys.exit(switch_power_state(sys.argv[1]))
+    sys.exit(send_command(sys.argv[1]))

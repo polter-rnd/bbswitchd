@@ -51,6 +51,8 @@ static char *S_module = NVIDIA_MODULE;
 static const int S_unload_retries = 5;
 static const int S_unload_retry_timeout = 1;
 
+/* Maximum legnth for command */
+static const int S_cmd_maxlen = 32;
 
 /**
  * Print out usage information.
@@ -151,8 +153,7 @@ static int parse_arguments(int argc, char *argv[]) {
 /**
  * Load the kernel module, powering on the card beforehand
  */
-static int switch_and_load(const char **errmsg)
-{
+static int switch_and_load(const char **errmsg) {
     struct pci_bus_id bus_id;
     char driver[sizeof(NVIDIA_DRIVER)];
 
@@ -193,8 +194,7 @@ static int switch_and_load(const char **errmsg)
 /**
  * Unload the kernel module and power down the card
  */
-static int switch_and_unload(const char **errmsg)
-{
+static int switch_and_unload(const char **errmsg) {
     struct pci_bus_id bus_id;
     char driver[sizeof(NVIDIA_DRIVER)];
 
@@ -231,6 +231,28 @@ static int switch_and_unload(const char **errmsg)
 }
 
 /**
+ * Get bbswitch status
+ */
+static int get_status(const char **errmsg) {
+    if (!bbswitch_is_available()) {
+        log_err("No bbswitch module available\n");
+    }
+
+    switch (bbswitch_status(NULL)) {
+    case SWITCH_ON:
+        *errmsg = "ON";
+        break;
+    case SWITCH_OFF:
+        *errmsg = "OFF";
+        break;
+    case SWITCH_UNAVAIL:
+        *errmsg = "UNAVAIL";
+    }
+
+    return 0;
+}
+
+/**
  * Handle client commands
  */
 void request_handler(struct server_conn *conn, const char *command) {
@@ -239,6 +261,8 @@ void request_handler(struct server_conn *conn, const char *command) {
         switch_and_load(&errmsg);
     } else if (!strcmp(command, "off")) {
         switch_and_unload(&errmsg);
+    } else if (!strcmp(command, "status")) {
+        get_status(&errmsg);
     } else {
         errmsg = "Ignoring unknown command";
         log_warn("%s '%s'\n", errmsg, command);
@@ -270,8 +294,7 @@ int main(int argc, char *argv[]) {
                 errno, strerror(errno));
     } else {
         server_setup_sighandler();
-        /* 4 is maximum command length since we accept only `on` or `off`. */
-        if (server_listen(S_sockfd, S_sockpath, 4, request_handler) != 0) {
+        if (server_listen(S_sockfd, S_sockpath, S_cmd_maxlen, request_handler) != 0) {
             log_err("Aborting server.\n");
         } else {
             log_close();
