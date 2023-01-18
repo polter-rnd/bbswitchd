@@ -80,9 +80,11 @@ After re-login you should be able to use `bbswitch` utility from your regular us
 ```bash
 $ bbswitch
 bbswitch
-Usage: bbswitch on | off
-$ bbswitch on  # Turn discrete GPU on
-$ bbswitch off # Turn discrete GPU off
+Usage: bbswitch on | off | status
+$ bbswitch on     # Turn discrete GPU on
+$ bbswitch status # Request current status
+ON
+$ bbswitch off    # Turn discrete GPU off
 ```
 
 ## Contributing
