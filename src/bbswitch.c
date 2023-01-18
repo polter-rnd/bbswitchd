@@ -85,7 +85,7 @@ int bbswitch_is_available(void) {
     /* module is not loaded yet. Try to load it, checking whether the device is
      * recognized by bbswitch. Assuming that vga_switcheroo was not told to OFF
      * the device */
-    if (module_load("bbswitch", "bbswitch")) {
+    if (module_load("bbswitch", "bbswitch") == 0) {
         log_debug("Successfully loaded bbswitch\n");
         /* hurrah, bbswitch could be loaded which means that the module is
          * available and that the card is supported */
