@@ -302,6 +302,7 @@ int main(int argc, char *argv[]) {
         if (server_listen(S_sockfd, S_sockpath, S_cmd_maxlen, request_handler) != 0) {
             log_err("Aborting server.\n");
         } else {
+            module_ctx_release();
             log_close();
             return EXIT_SUCCESS;
         }
