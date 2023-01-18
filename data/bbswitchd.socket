@@ -5,6 +5,7 @@ Description=Socket for bbswitchd daemon
 ListenDatagram=%t/bbswitchd.sock
 SocketGroup=bbswitchd
 SocketMode=0660
+FlushPending=yes
 
 [Install]
 WantedBy=sockets.target
