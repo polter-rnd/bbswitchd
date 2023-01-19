@@ -5,6 +5,7 @@ systemd_system_unit_dir = systemd.get_variable(
 )
 
 systemd_unit_conf = configuration_data()
+systemd_unit_conf.set('BINDIR', get_option('prefix') / get_option('bindir'))
 systemd_unit_conf.set('SBINDIR', get_option('prefix') / get_option('sbindir'))
 
 configure_file(

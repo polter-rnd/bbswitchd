@@ -54,24 +54,30 @@ static const int S_unload_retry_timeout = 1;
 /* Maximum legnth for command */
 static const int S_cmd_maxlen = 32;
 
+/* Default GPU state to be set on server start */
+enum switch_state S_default_switch = SWITCH_UNAVAIL;
+
 /**
  * Print out usage information.
  */
 static void usage(void) {
-	fprintf(stderr, "Usage: bbswitchd [ -v ] [ -l log ] [ -m module ] [ -f fd ] [ -s sock ]\n");
-	fprintf(stderr, "Options:\n");
-	fprintf(stderr, "  -v,--verbose  Display debug messages. Takes no arguments.\n");
-	fprintf(stderr, "  -l,--log      Logging engine.\n");
+    fprintf(stderr, "Usage: bbswitchd [ -v ] [ -l log ] [ -m module ] [ -f fd ] [ -s sock ]\n");
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "  -v,--verbose  Display debug messages. Takes no arguments.\n");
+    fprintf(stderr, "  -l,--log      Logging engine.\n");
     fprintf(stderr, "                Valid arguments: syslog, stderr, file=/path/to/logfile\n");
     fprintf(stderr, "                Default: stderr\n");
-	fprintf(stderr, "  -m,--module   Kernel module to load/unload after GPU power state switch.\n");
+    fprintf(stderr, "  -m,--module   Kernel module to load/unload after GPU power state switch.\n");
     fprintf(stderr, "                Default: nvidia-drm\n");
-	fprintf(stderr, "  -f,--fd       Ready to use file descriptor to listen on.\n");
+    fprintf(stderr, "  -f,--fd       Ready to use file descriptor to listen on.\n");
     fprintf(stderr, "                Use when starting by inetd or systemd socket activation.\n");
     fprintf(stderr, "                Do not use together with --sock option.\n");
-	fprintf(stderr, "  -s,--sock     Path to UNIX socket that will be created.\n");
+    fprintf(stderr, "  -s,--sock     Path to UNIX socket that will be created.\n");
     fprintf(stderr, "                Do not use together with --fd option.\n");
-	fprintf(stderr, "  -h,--help     Display this message.\n");
+    fprintf(stderr, "  -d-,--default Default GPU state to be set on service start.\n");
+    fprintf(stderr, "                Valid arguments: on, off\n");
+    fprintf(stderr, "                Do not use together with --fd option.\n");
+    fprintf(stderr, "  -h,--help     Display this message.\n");
 }
 
 /**
@@ -80,12 +86,13 @@ static void usage(void) {
 static int parse_arguments(int argc, char *argv[]) {
     int c = 0, option_index = 0;
     static struct option long_options[] = {
-        { "verbose", no_argument,       0, 'v' },
-        { "log",     required_argument, 0, 'l' },
-        { "module",  required_argument, 0, 'm' },
-        { "fd",      required_argument, 0, 'f' },
-        { "sock",    required_argument, 0, 's' },
-        { "help",    required_argument, 0, 'h' },
+        { "verbose",  no_argument,       0, 'v' },
+        { "log",      required_argument, 0, 'l' },
+        { "module",   required_argument, 0, 'm' },
+        { "fd",       required_argument, 0, 'f' },
+        { "sock",     required_argument, 0, 's' },
+        { "default",  required_argument, 0, 'd' },
+        { "help",     required_argument, 0, 'h' },
         { 0, 0, 0, 0 }
     };
 
@@ -129,6 +136,17 @@ static int parse_arguments(int argc, char *argv[]) {
             S_sockpath = optarg;
             break;
 
+        case 'd':
+            if (!strcmp(optarg, "on")) {
+                S_default_switch = SWITCH_ON;
+            } else if (!strcmp(optarg, "off")) {
+                S_default_switch = SWITCH_OFF;
+            } else {
+                fprintf(stderr, "Unknown --default value: '%s'\n", optarg);
+                return -1;
+            }
+            break;
+
         case 'h':
         default:
             usage();
@@ -168,7 +186,7 @@ static int switch_and_load(const char **errmsg) {
         return 0;
     } else {
         bbswitch_on();
-        if (bbswitch_status(&bus_id) == SWITCH_ON) {
+        if (bbswitch_status(NULL) == SWITCH_ON) {
             log_info("Discrete graphics card enabled\n");
         } else {
             *errmsg = "Could not enable discrete graphics card";
@@ -239,10 +257,6 @@ static int switch_and_unload(const char **errmsg) {
  * Get bbswitch status
  */
 static int get_status(const char **errmsg) {
-    if (!bbswitch_is_available()) {
-        log_err("No bbswitch module available\n");
-    }
-
     switch (bbswitch_status(NULL)) {
     case SWITCH_ON:
         *errmsg = "ON";
@@ -298,6 +312,17 @@ int main(int argc, char *argv[]) {
         log_err("Failed to initialize kmod context (errno %d): %s\n",
                 errno, strerror(errno));
     } else {
+        switch (S_default_switch) {
+        case SWITCH_ON:
+            switch_and_load(NULL);
+            break;
+        case SWITCH_OFF:
+            switch_and_unload(NULL);
+            break;
+        default:
+            break;
+        }
+
         server_setup_sighandler();
         if (server_listen(S_sockfd, S_sockpath, S_cmd_maxlen, request_handler) != 0) {
             log_err("Aborting server.\n");

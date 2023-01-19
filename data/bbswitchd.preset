@@ -1,1 +1,1 @@
-enable bbswitchd.socket
+enable bbswitchd.service

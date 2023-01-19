@@ -1,9 +1,11 @@
 [Unit]
 Description=GPU power state management daemon
+BindsTo=bbswitchd.socket
+After=bbswitchd.socket
 
 [Service]
 Type=simple
-ExecStart=@SBINDIR@/bbswitchd --log=syslog --fd=3
+ExecStart=@SBINDIR@/bbswitchd --log=syslog --default=off --fd=3
 Restart=always
 RestartSec=60
 

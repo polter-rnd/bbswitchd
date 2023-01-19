@@ -62,12 +62,11 @@ getent group bbswitchd >/dev/null || groupadd -r bbswitchd
 %systemd_post bbswitchd.service
 %systemd_post bbswitchd.socket
 
+systemctl daemon-reload
 if [ $1 -eq 2 ]; then
-    # On upgrade just stop it, will be reactivated by socket
-    systemctl stop bbswitchd.service
-    systemctl restart bbswitchd.socket
+    systemctl restart bbswitchd.service
 else
-    systemctl start bbswitchd.socket
+    systemctl start bbswitchd.service
 fi
 
 
@@ -77,7 +76,7 @@ fi
 
 
 %postun
-%systemd_postun_with_restart bbswitchd.service
+%systemd_postun bbswitchd.service
 %systemd_postun bbswitchd.socket
 
 
