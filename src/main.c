@@ -174,6 +174,10 @@ static int parse_arguments(int argc, char *argv[]) {
 static int switch_and_load(const char **errmsg) {
     struct pci_bus_id bus_id;
     char driver[sizeof(NVIDIA_DRIVER)];
+    const char *emptymsg = "";
+    if (errmsg == NULL) {
+        errmsg = &emptymsg;
+    }
 
     if (!bbswitch_is_available()) {
         *errmsg = "No bbswitch module available";
@@ -220,6 +224,10 @@ static int switch_and_load(const char **errmsg) {
 static int switch_and_unload(const char **errmsg) {
     struct pci_bus_id bus_id;
     char driver[sizeof(NVIDIA_DRIVER)];
+    const char *emptymsg = "";
+    if (errmsg == NULL) {
+        errmsg = &emptymsg;
+    }
 
     if (!bbswitch_is_available()) {
         *errmsg = "No bbswitch module available";
