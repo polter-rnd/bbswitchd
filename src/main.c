@@ -48,7 +48,7 @@ static char *S_sockpath = NULL;
 static char *S_module = NVIDIA_MODULE;
 
 /* Timeout for unloading modules */
-static const int S_unload_retries = 5;
+static const int S_unload_retries = 3;
 static const int S_unload_retry_timeout = 1;
 
 /* Maximum legnth for command */
