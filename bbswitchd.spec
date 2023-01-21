@@ -1,16 +1,14 @@
-%global commit dd9320ad0109026d3607252472b8c36ceffc6396
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
 Name:           bbswitchd
 Version:        0.1.0
-Release:        1.git%{shortcommit}%{?dist}
+Release:        1%{?dist}
 Summary:        Daemon for managing discrete NVIDIA GPU power state on Optimus laptops
 
 License:        GPLv3+
 URL:            https://github.com/polter-rnd/bbswitchd
-Source0:        https://github.com/polter-rnd/bbswitchd/archive/%{commit}/bbswitchd-%{shortcommit}.tar.gz
+Source0:        https://github.com/polter-rnd/bbswitchd/archive/%{version}/bbswitchd-%{version}.tar.gz
 
 BuildRequires:  gcc
+BuildRequires:  meson
 BuildRequires:  systemd
 BuildRequires:  pkgconfig(libkmod)
 
@@ -42,7 +40,7 @@ SELinux policy module for use with bbswitchd.
 
 
 %prep
-%autosetup -p1 -n bbswitchd-%{commit}
+%autosetup -p1 -n bbswitchd-%{version}
 
 
 %build
