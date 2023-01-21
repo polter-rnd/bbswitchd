@@ -62,7 +62,7 @@ int module_load(const char *module_name, const char *driver) {
     int flags = KMOD_PROBE_IGNORE_LOADED;
     struct kmod_list *l, *list = NULL;
 
-    if (module_is_loaded(driver) == 0) {
+    if (module_is_loaded(module_name) == 0) {
         /* the module has not loaded yet, try to load it */
 
         log_info("Loading driver '%s' (module '%s')\n", driver, module_name);

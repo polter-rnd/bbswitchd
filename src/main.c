@@ -200,10 +200,10 @@ static int switch_and_load(const char **errmsg) {
     }
 
     if (pci_get_driver(driver, &bus_id, sizeof(driver))) {
-        /* if the loaded driver does not equal the driver from config, unload it */
+        /* If the loaded driver does not equal the driver from config, unload it */
         if (strcasecmp(NVIDIA_DRIVER, driver)) {
             if (!module_unload(driver, S_unload_retries, S_unload_retry_timeout)) {
-                /* driver failed to unload, aborting */
+                /* Driver failed to unload, aborting */
                 return -1;
             }
         }
@@ -245,6 +245,7 @@ static int switch_and_unload(const char **errmsg) {
         if (module_unload(driver, S_unload_retries, S_unload_retry_timeout) != 0) {
             *errmsg = "Could not unload GPU driver";
             log_err("%s\n", *errmsg);
+            module_load(S_module, driver); /* Load back if we unloaded something */
             return -1;
         }
     }
