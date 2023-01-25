@@ -1,0 +1,32 @@
+#!/bin/sh
+# postinst script for bbswitchd
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# group that allows users to use bbswitchd socket
+GROUP=bbswitchd
+
+# add members of these groups automatically to group "bbswitchd" for new
+# installations
+USE_GROUPS='sudo admin'
+
+case "$1" in
+  configure)
+    # only add a group and members if the configured group does match the
+    # default group and if the group is missing
+    if grep -qx SocketGroup=$GROUP /usr/lib/systemd/system/bbswitchd.socket &&
+        ! getent group $GROUP > /dev/null; then
+        groupadd --system $GROUP
+        users=$(getent -s files group $USE_GROUPS | cut -d: -f4 | tr , '\n' | sort -u)
+        for user in $users; do
+            gpasswd -a $user $GROUP
+        done
+    fi
+    ;;
+  triggered)
+    ;;
+esac
+
+#DEBHELPER#

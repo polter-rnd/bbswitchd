@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+%:
+	dh $@
+
+override_dh_installsystemd:
+	# Install systemd service file by debhelper instead
+	rm -f $(CURDIR)/debian/bbswitchd.service $(CURDIR)/debian/bbswitchd.socket
+	mv $(CURDIR)/debian/bbswitchd/usr/lib/systemd/system/bbswitchd.service $(CURDIR)/debian
+	dh_installsystemd
+

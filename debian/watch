@@ -1,0 +1,4 @@
+version=4
+opts="filenamemangle=s%(?:.*?)?v?(\d[\d.]*)\.tar\.gz%bbswitchd-$1.tar.gz%" \
+   https://github.com/polter-rnd/bbswitchd/tags \
+   (?:.*?/)?v?(\d[\d.]*)\.tar\.gz debian uupdate

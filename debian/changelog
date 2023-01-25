@@ -1,0 +1,11 @@
+bbswitchd (0.1.1-1) UNRELEASED; urgency=medium
+
+  * Fixed package build depencendies
+
+ -- Pavel Artsishevsky <polter.rnd@gmail.com>  Thu, 26 Jan 2023 00:17:12 +0300
+
+bbswitchd (0.1.0-1) UNRELEASED; urgency=medium
+
+  * Initial release
+
+ -- Pavel Artsishevsky <polter.rnd@gmail.com>  Mon, 23 Jan 2023 23:09:39 +0300

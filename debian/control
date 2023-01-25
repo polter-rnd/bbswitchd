@@ -1,0 +1,23 @@
+Source: bbswitchd
+Section: utils
+Priority: optional
+Maintainer: Pavel Artsishevsky <polter.rnd@gmail.com>
+Build-Depends: debhelper-compat (= 12),
+               meson (>= 0.53.0),
+               pkg-config,
+               libkmod-dev,
+               systemd,
+               gcc
+Standards-Version: 4.5.1
+Homepage: https://github.com/polter-rnd/bbswitchd
+Rules-Requires-Root: no
+
+Package: bbswitchd
+Architecture: linux-any
+Depends: bbswitch-dkms, ${shlibs:Depends}, ${misc:Depends}
+Description: Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
+ Internally uses bbswitch kernel module to switch video adapter power state.
+ .
+ Useful for pre-Turing GPU generations without dynamic power management features,
+ allows to fully benefit from NVIDIA PRIME Render Offload technology
+ without need to keep graphics adapter turned on all the time.

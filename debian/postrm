@@ -1,0 +1,16 @@
+#!/bin/sh
+# postrm script for bbswitchd
+#
+# see: dh_installdeb(1)
+
+set -e
+
+case "$1" in
+  purge)
+    groupdel bbswitchd || true
+    ;;
+  remove)
+    ;;
+esac
+
+#DEBHELPER#
