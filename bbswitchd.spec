@@ -1,14 +1,14 @@
 Name:           bbswitchd
 Version:        0.1.0
-Release:        1%{?dist}
-Summary:        Daemon for managing discrete NVIDIA GPU power state on Optimus laptops
+Release:        2%{?dist}
+Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
 URL:            https://github.com/polter-rnd/bbswitchd
 Source0:        https://github.com/polter-rnd/bbswitchd/archive/%{version}/bbswitchd-%{version}.tar.gz
 
 BuildRequires:  gcc
-BuildRequires:  meson
+BuildRequires:  meson >= 0.53.0
 BuildRequires:  systemd
 BuildRequires:  pkgconfig(libkmod)
 
@@ -19,9 +19,11 @@ Recommends:     %{name}-selinux = %{version}-%{release}
 
 
 %description
-Daemon for managing discrete NVIDIA GPU power state on Optimus laptops.
-Uses bbswitch kernel module to switch video adapter power state (ON or OFF).
+Internally uses bbswitch kernel module to switch video adapter power state.
 
+Useful for pre-Turing GPU generations without dynamic power management features,
+allows to fully benefit from NVIDIA PRIME Render Offload technology
+without need to keep graphics adapter turned on all the time.
 
 %package selinux
 Summary:        SELinux policies for bbswitchd
@@ -62,7 +64,7 @@ getent group bbswitchd >/dev/null || groupadd -r bbswitchd
 
 systemctl daemon-reload
 if [ $1 -eq 2 ]; then
-    systemctl restart bbswitchd.service
+    systemctl try-restart bbswitchd.service
 else
     systemctl start bbswitchd.service
 fi
@@ -98,11 +100,11 @@ fi
 %{_presetdir}/90-bbswitchd.preset
 %{_udevrulesdir}/60-bbswitchd-nvidia-mutter.rules
 %{_udevrulesdir}/90-bbswitchd-nvidia-dev.rules
-%{_datadir}/selinux/devel/include/contrib/bbswitchd.if
 
 
 %files selinux
 %{_datadir}/selinux/packages/bbswitchd.pp
+%{_datadir}/selinux/devel/include/contrib/bbswitchd.if
 
 
 %changelog
