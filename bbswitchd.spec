@@ -1,6 +1,6 @@
 Name:           bbswitchd
-Version:        0.1.0
-Release:        2%{?dist}
+Version:        0.1.1
+Release:        1%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
@@ -16,6 +16,12 @@ Requires:       bbswitch-kmod
 Recommends:     %{name}-selinux = %{version}-%{release}
 
 %{?systemd_requires}
+
+
+# UNIX socket group
+%define socket_group bbswitchd
+# Users from these will be added to socket group
+%define admin_groups wheel
 
 
 %description
@@ -54,21 +60,33 @@ SELinux policy module for use with bbswitchd.
 %meson_install
 
 
-%pre
-getent group bbswitchd >/dev/null || groupadd -r bbswitchd
-
-
 %post
 %systemd_post bbswitchd.service
 %systemd_post bbswitchd.socket
 
+# On upgrade restart if running, on install just start
 systemctl daemon-reload
-if [ $1 -eq 2 ]; then
+if [ "${1}" -gt 1 ]; then
     systemctl try-restart bbswitchd.service
 else
+    # only add a group and members if the configured group does match the
+    # default group and if the group is missing
+    if grep -qx SocketGroup=%{socket_group} %{_unitdir}/bbswitchd.socket &&
+        ! getent group %{socket_group} > /dev/null; then
+        groupadd --system %{socket_group}
+        users=$(getent -s files group %{admin_groups} | cut -d: -f4 | tr , '\n' | sort -u)
+        for user in $users; do
+            gpasswd -a $user %{socket_group}
+        done
+    fi
+
     systemctl start bbswitchd.service
 fi
 
+# Regenerate initramfs on install/upgrade
+if [ -x "$(which dracut)" ]; then
+    dracut -f
+fi
 
 %preun
 %systemd_preun bbswitchd.service
@@ -78,6 +96,14 @@ fi
 %postun
 %systemd_postun bbswitchd.service
 %systemd_postun bbswitchd.socket
+
+# Regenerate initramfs on uninstall
+if [ "${1}" -eq 0 ] && [ -x "$(which dracut)" ]; then
+    dracut -f
+fi
+
+# Remove group
+groupdel %{socket_group} || true
 
 
 %post selinux
@@ -108,5 +134,8 @@ fi
 
 
 %changelog
+* Thu Jan 26 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.1-1
+- Various packaging updates
+
 * Tue Jan 17 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.0-1
 - Initial release
