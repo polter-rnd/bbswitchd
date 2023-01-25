@@ -1,6 +1,9 @@
 # bbswitchd
 
-Daemon for managing discrete NVIDIA GPU power state on Optimus laptops.
+Daemon for toggling discrete NVIDIA GPU power on Optimus laptops.
+
+Internally uses [bbswitch](https://github.com/Bumblebee-Project/bbswitch)
+kernel module to switch video adapter power state.
 
 Useful for pre-Turing GPU generations without dynamic power management features,
 allows to fully benefit from NVIDIA
@@ -11,9 +14,6 @@ For Turing generation cards with Intel Coffee Lake or above CPUs as well as some
 Ryzen CPUs like the 5800H, it is possible to fully power down the GPU when not in use
 automatically without user interaction:
 [see NVIDIA documentation](https://us.download.nvidia.com/XFree86/Linux-x86_64/495.46/README/dynamicpowermanagement.html).
-
-Uses [bbswitch](https://github.com/Bumblebee-Project/bbswitch) kernel module
-to switch video adapter power state (`ON` or `OFF`).
 
 ## Installation
 
@@ -31,7 +31,7 @@ $ sudo dnf install kmod-devel meson # selinux-policy-devel
 For Ubuntu:
 
 ```bash
-$ sudo apt-get install libkmod-dev meson # selinux-policy-dev
+$ sudo apt-get install gcc libkmod-dev pkg-config meson # selinux-policy-dev
 ```
 
 #### Building from source
