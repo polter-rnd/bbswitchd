@@ -14,7 +14,10 @@ Rules-Requires-Root: no
 
 Package: bbswitchd
 Architecture: linux-any
-Depends: bbswitch-dkms, ${shlibs:Depends}, ${misc:Depends}
+Depends: python3,
+         bbswitch-dkms,
+         ${shlibs:Depends},
+         ${misc:Depends}
 Description: Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
  Internally uses bbswitch kernel module to switch video adapter power state.
  .

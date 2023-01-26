@@ -1,6 +1,6 @@
 Name:           bbswitchd
 Version:        0.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
@@ -12,6 +12,7 @@ BuildRequires:  meson >= 0.53.0
 BuildRequires:  systemd
 BuildRequires:  pkgconfig(libkmod)
 
+Requires:       python3
 Requires:       bbswitch-kmod
 Recommends:     %{name}-selinux = %{version}-%{release}
 
@@ -134,6 +135,9 @@ fi
 
 
 %changelog
+* Thu Jan 26 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.1-2
+- Added Python3 to runtime dependencies
+
 * Thu Jan 26 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.1-1
 - Various packaging updates
 
