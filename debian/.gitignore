@@ -1,0 +1,8 @@
+.debhelper/
+bbswitchd.debhelper.log
+bbswitchd.postrm.debhelper
+bbswitchd.service
+bbswitchd.substvars
+bbswitchd/
+debhelper-build-stamp
+files
