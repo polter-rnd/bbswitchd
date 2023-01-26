@@ -17,6 +17,33 @@ automatically without user interaction:
 
 ## Installation
 
+### Using prebuilt packages
+
+The most simple way to install is to use prebuilt packages from
+[copr for Fedora](https://copr.fedorainfracloud.org/coprs/polter/bumblebee)
+or [PPA for Ubuntu](https://launchpad.net/~polter-rnd/+archive/ubuntu/bbswitch-gui).
+
+For Fedora:
+
+```bash
+$ sudo dnf copr enable polter/bumblebee
+$ sudo dnf install bbswitchd
+```
+
+For Ubuntu:
+```bash
+$ sudo add-apt-repository ppa:polter-rnd/bbswitch-gui
+$ sudo apt update
+$ sudo apt install bbswitchd
+```
+
+After package installation please check that your user have been added to `bbswitchd`
+group using `groups` command, and then re-login or reboot the machine to apply it.
+
+That simple.
+
+### Building from source
+
 #### Requirements
 
 First you have to install `kmod` library and `meson` build system.
@@ -59,9 +86,12 @@ $ sudo /usr/sbin/load_policy
 $ sudo restorecon -R /usr/sbin/bbswitchd
 ```
 
-## Usage
+#### Initial configuration
 
-First create `bbswitchd` group and add yourself to it:
+This step is not needed if you install prebuilt package from repository
+since it's done automatically by package manager.
+
+After manual installation you need to create `bbswitchd` group and add yourself to it:
 
 ```bash
 $ sudo groupadd -r bbswitchd
@@ -75,7 +105,9 @@ $ sudo systemctl enable bbswitchd.socket
 $ sudo systemctl start bbswitchd.socket
 ```
 
-After re-login you should be able to use `bbswitch` utility from your regular user:
+After re-login you should be able to use `bbswitch` utility from your regular user.
+
+## Usage
 
 ```bash
 $ bbswitch
@@ -97,4 +129,5 @@ Please make sure to update tests as appropriate.
 ## License
 
 This software is distributed under [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html).
-See `LICENSE` file for more information.
+See [LICENSE](https://raw.githubusercontent.com/polter-rnd/bbswitchd/master/LICENSE)
+file for more information.
