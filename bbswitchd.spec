@@ -1,6 +1,6 @@
 Name:           bbswitchd
 Version:        0.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
@@ -14,6 +14,8 @@ BuildRequires:  pkgconfig(libkmod)
 
 Requires:       python3
 Requires:       bbswitch-kmod
+Requires(post):   dracut
+Requires(postun): dracut
 Recommends:     %{name}-selinux = %{version}-%{release}
 
 %{?systemd_requires}
@@ -37,10 +39,9 @@ Summary:        SELinux policies for bbswitchd
 
 BuildRequires:  selinux-policy-devel
 
-Requires(post): libselinux-utils
-Requires(post): policycoreutils
-Requires(post): policycoreutils-python-utils
-Requires(post): selinux-policy-base >= %{_selinux_policy_version}
+Requires: policycoreutils, libselinux-utils
+Requires(post): selinux-policy-base >= %{selinux_policyver}, policycoreutils
+Requires(postun): policycoreutils
 
 BuildArch:      noarch
 
@@ -85,9 +86,7 @@ else
 fi
 
 # Regenerate initramfs on install/upgrade
-if [ -x "$(which dracut)" ]; then
-    dracut -f
-fi
+dracut -f
 
 %preun
 %systemd_preun bbswitchd.service
@@ -99,7 +98,7 @@ fi
 %systemd_postun bbswitchd.socket
 
 # Regenerate initramfs on uninstall
-if [ "${1}" -eq 0 ] && [ -x "$(which dracut)" ]; then
+if [ "${1}" -eq 0 ]; then
     dracut -f
 fi
 
@@ -135,6 +134,10 @@ fi
 
 
 %changelog
+* Wed Feb 08 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.1-3
+- Added dracut to post/postun dependencies
+- Fix SELinux dependency definitions
+
 * Thu Jan 26 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.1-2
 - Added Python3 to runtime dependencies
 
