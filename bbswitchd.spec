@@ -1,6 +1,6 @@
 Name:           bbswitchd
-Version:        0.1.1
-Release:        3%{?dist}
+Version:        0.1.2
+Release:        1%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
@@ -134,6 +134,9 @@ fi
 
 
 %changelog
+* Sun Mar 19 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.2-1
+- Minor fixes
+
 * Wed Feb 08 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.1-3
 - Added dracut to post/postun dependencies
 - Fix SELinux dependency definitions
