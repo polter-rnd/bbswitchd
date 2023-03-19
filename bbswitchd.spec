@@ -1,6 +1,6 @@
 Name:           bbswitchd
 Version:        0.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
@@ -97,14 +97,11 @@ dracut -f
 %systemd_postun bbswitchd.service
 %systemd_postun bbswitchd.socket
 
-# Regenerate initramfs on uninstall
+# Regenerate initramfs and remove group on uninstall
 if [ "${1}" -eq 0 ]; then
     dracut -f
+    groupdel %{socket_group} || true
 fi
-
-# Remove group
-groupdel %{socket_group} || true
-
 
 %post selinux
 %selinux_modules_install %{_datadir}/selinux/packages/bbswitchd.pp
@@ -134,6 +131,9 @@ fi
 
 
 %changelog
+* Sun Mar 19 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.2-2
+- Don't remove bbswitchd group on update
+
 * Sun Mar 19 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.2-1
 - Minor fixes
 
