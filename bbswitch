@@ -46,7 +46,7 @@ def send_command(command: str):
         client.sendto(command.encode('ascii') + b'\0', BBSWITCHD_SOCK)
         response, _ = client.recvfrom(1024)
         if command == 'status':
-             print(response.decode())
+            print(response.decode())
         elif response != b'\0':
             print(response.decode(), file=sys.stderr)
             return 1
