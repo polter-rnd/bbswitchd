@@ -9,6 +9,7 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
 # Install systemd service file by debhelper instead
 override_dh_installsystemd:
-	rm -f $(CURDIR)/debian/bbswitchd.service $(CURDIR)/debian/bbswitchd.socket
-	mv $(CURDIR)/debian/bbswitchd/usr/lib/systemd/system/bbswitchd.service $(CURDIR)/debian
-	dh_installsystemd
+	rm -f $(CURDIR)/debian/*.{service,socket}
+	mv -t $(CURDIR)/debian $(CURDIR)/debian/bbswitchd/usr/lib/systemd/system/*
+	dh_installsystemd --name=bbswitchd
+	dh_installsystemd --no-start --name=bbswitch-sleep

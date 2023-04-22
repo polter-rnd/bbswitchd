@@ -16,7 +16,7 @@ configure_file(
     install_dir : systemd_system_unit_dir,
 )
 
-install_data('bbswitchd.socket',
+install_data(['bbswitchd.socket', 'bbswitch-sleep.service'],
     install_dir : systemd_system_unit_dir
 )
 

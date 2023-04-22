@@ -1,1 +1,2 @@
 enable bbswitchd.service
+enable bbswitch-sleep.service

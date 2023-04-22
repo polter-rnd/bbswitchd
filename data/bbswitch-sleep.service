@@ -1,0 +1,14 @@
+[Unit]
+Description=Toggle bbswitch on sleep/wakeup
+Before=sleep.target
+StopWhenUnneeded=yes
+ConditionPathExists=/proc/acpi/bbswitch
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-/usr/sbin/rmmod bbswitch
+ExecStop=-/usr/sbin/modprobe bbswitch
+
+[Install]
+WantedBy=sleep.target
