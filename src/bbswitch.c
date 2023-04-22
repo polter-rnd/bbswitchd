@@ -54,8 +54,12 @@ enum switch_state bbswitch_status(struct pci_bus_id *bus_id) {
             } else if (!strcmp(state, "ON")) {
                 ret = SWITCH_ON;
             }
+        } else {
+            log_err("Unable to parse %s\n", BBSWITCH_PATH);
         }
         fclose(bbs);
+    } else {
+        log_err("Could not open %s: %s\n", BBSWITCH_PATH, strerror(errno));
     }
 
     return ret;
