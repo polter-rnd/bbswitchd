@@ -1,6 +1,6 @@
 Name:           bbswitchd
 Version:        0.1.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
@@ -67,11 +67,7 @@ SELinux policy module for use with bbswitchd.
 %systemd_post bbswitchd.service
 %systemd_post bbswitchd.socket
 
-# On upgrade restart if running, on install just start
-systemctl daemon-reload
-if [ "${1}" -gt 1 ]; then
-    systemctl try-restart bbswitchd.service
-else
+if [ "${1}" -eq 1 ]; then
     # only add a group and members if the configured group does match the
     # default group and if the group is missing
     if grep -qx SocketGroup=%{socket_group} %{_unitdir}/bbswitchd.socket &&
@@ -97,8 +93,8 @@ dracut -f
 
 %postun
 %systemd_postun bbswitch-sleep.service
-%systemd_postun bbswitchd.service
-%systemd_postun bbswitchd.socket
+%systemd_postun_with_restart bbswitchd.service
+%systemd_postun_with_restart bbswitchd.socket
 
 # Regenerate initramfs and remove group on uninstall
 if [ "${1}" -eq 0 ]; then
@@ -135,6 +131,9 @@ fi
 
 
 %changelog
+* Sat Apr 22 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.3-2
+- Restart bbswitchd.socket on update/reinstall
+
 * Sat Apr 22 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.3-1
 - Add bbswitch-sleep.service for toggling module on sleep/wakeup
 
