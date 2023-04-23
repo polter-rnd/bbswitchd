@@ -154,8 +154,13 @@ static int module_unload_recursive(struct kmod_module *mod, int retries, int tim
 
     if (err != 0) {
         if (refcnt == 0) {
-            log_err("Failed to unload module '%s' (errno %d): %s\n",
-                    kmod_module_get_name(mod), refcnt, errno, strerror(errno));
+            if (errno == 0) {
+                log_err("Failed to unload module '%s'\n",
+                        kmod_module_get_name(mod));
+            } else {
+                log_err("Failed to unload module '%s' (errno %d): %s\n",
+                        kmod_module_get_name(mod), refcnt, errno, strerror(errno));
+            }
         } else {
             log_err("Failed to unload module '%s' (ref count: %d): Module still in use\n",
                     kmod_module_get_name(mod), refcnt);
