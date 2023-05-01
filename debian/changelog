@@ -1,3 +1,11 @@
+bbswitchd (0.1.4-1) UNRELEASED; urgency=medium
+
+  * Load bbswitch module on boot
+  * Fix unintentional turning GPU on after wakeup
+  * Use socket activation instead of autostarting daemon
+
+ -- Pavel Artsishevsky <polter.rnd@gmail.com>  Mon, 01 May 2023 13:56:11 +0300
+
 bbswitchd (0.1.3-1) UNRELEASED; urgency=medium
 
   * Add bbswitch-sleep.service for toggling module on sleep/wakeup

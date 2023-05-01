@@ -5,7 +5,7 @@ After=bbswitchd.socket
 
 [Service]
 Type=simple
-ExecStart=@SBINDIR@/bbswitchd --log=syslog --default=off --fd=3
+ExecStart=@SBINDIR@/bbswitchd --log=syslog --fd=3
 Restart=always
 RestartSec=60
 

@@ -1,6 +1,6 @@
 Name:           bbswitchd
-Version:        0.1.3
-Release:        2%{?dist}
+Version:        0.1.4
+Release:        1%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
 License:        GPLv3+
@@ -40,7 +40,7 @@ Summary:        SELinux policies for bbswitchd
 BuildRequires:  selinux-policy-devel
 
 Requires: policycoreutils, libselinux-utils
-Requires(post): selinux-policy-base >= %{selinux_policyver}, policycoreutils
+Requires(post): selinux-policy-base >= %{_selinux_policy_version}, policycoreutils
 Requires(postun): policycoreutils
 
 BuildArch:      noarch
@@ -68,7 +68,7 @@ SELinux policy module for use with bbswitchd.
 %systemd_post bbswitchd.socket
 
 if [ "${1}" -eq 1 ]; then
-    # only add a group and members if the configured group does match the
+    # Add a group and members if the configured group does match the
     # default group and if the group is missing
     if grep -qx SocketGroup=%{socket_group} %{_unitdir}/bbswitchd.socket &&
         ! getent group %{socket_group} > /dev/null; then
@@ -78,12 +78,16 @@ if [ "${1}" -eq 1 ]; then
             gpasswd -a $user %{socket_group}
         done
     fi
-
-    systemctl start bbswitchd.service
 fi
 
 # Regenerate initramfs on install/upgrade
 dracut -f
+
+
+%posttrans
+# Create socket automatically
+systemctl start bbswitchd.socket
+
 
 %preun
 %systemd_preun bbswitch-sleep.service
@@ -102,6 +106,7 @@ if [ "${1}" -eq 0 ]; then
     groupdel %{socket_group} || true
 fi
 
+
 %post selinux
 %selinux_modules_install %{_datadir}/selinux/packages/bbswitchd.pp
 
@@ -116,13 +121,14 @@ fi
 %license LICENSE
 %{_bindir}/bbswitch
 %{_sbindir}/bbswitchd
-%{_prefix}/lib/modprobe.d/bbswitchd-blacklist.conf
 %{_unitdir}/bbswitch-sleep.service
 %{_unitdir}/bbswitchd.service
 %{_unitdir}/bbswitchd.socket
 %{_presetdir}/90-bbswitchd.preset
-%{_udevrulesdir}/60-bbswitchd-nvidia-mutter.rules
-%{_udevrulesdir}/90-bbswitchd-nvidia-dev.rules
+%{_prefix}/lib/modprobe.d/bbswitch.conf
+%{_prefix}/lib/modules-load.d/bbswitch.conf
+%{_udevrulesdir}/60-bbswitch-nvidia-mutter.rules
+%{_udevrulesdir}/90-bbswitch-nvidia-dev.rules
 
 
 %files selinux
@@ -131,6 +137,11 @@ fi
 
 
 %changelog
+* Mon May 01 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.4-1
+- Load bbswitch module on boot
+- Fix unintentional turning GPU on after wakeup
+- Use socket activation instead of autostarting daemon
+
 * Sat Apr 22 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.3-2
 - Restart bbswitchd.socket on update/reinstall
 

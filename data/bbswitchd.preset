@@ -1,2 +1,3 @@
-enable bbswitchd.service
+disable bbswitchd.service
+enable bbswitchd.socket
 enable bbswitch-sleep.service
