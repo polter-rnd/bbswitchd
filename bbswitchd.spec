@@ -1,5 +1,5 @@
 Name:           bbswitchd
-Version:        0.1.4
+Version:        0.1.5
 Release:        1%{?dist}
 Summary:        Daemon for toggling discrete NVIDIA GPU power on Optimus laptops
 
@@ -126,7 +126,6 @@ fi
 %{_unitdir}/bbswitchd.socket
 %{_presetdir}/90-bbswitchd.preset
 %{_prefix}/lib/modprobe.d/bbswitch.conf
-%{_prefix}/lib/modules-load.d/bbswitch.conf
 %{_udevrulesdir}/60-bbswitch-nvidia-mutter.rules
 %{_udevrulesdir}/90-bbswitch-nvidia-dev.rules
 
@@ -137,6 +136,9 @@ fi
 
 
 %changelog
+* Sun Dec 03 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.5-1
+- Workaround boot freeze with disabling discrete GPU on boot
+
 * Mon May 01 2023 Pavel Artsishevsky <polter.rnd@gmail.com> - 0.1.4-1
 - Load bbswitch module on boot
 - Fix unintentional turning GPU on after wakeup

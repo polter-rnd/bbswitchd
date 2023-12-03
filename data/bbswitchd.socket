@@ -7,5 +7,11 @@ SocketGroup=bbswitchd
 SocketMode=0660
 FlushPending=yes
 
+# Loading module via /lib/modules-load.d with
+# load_state=0 option triggers boot freeze,
+# so better modprobe it here as a workaround.
+ExecStartPre=/usr/sbin/modprobe bbswitch
+ExecStopPost=/usr/sbin/modprobe -r bbswitch
+
 [Install]
 WantedBy=sockets.target

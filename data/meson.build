@@ -39,8 +39,3 @@ install_data('bbswitch-modprobe.conf',
     rename : 'bbswitch.conf',
     install_dir : get_option('prefix') / 'lib/modprobe.d'
 )
-
-install_data('bbswitch-modules-load.conf',
-    rename : 'bbswitch.conf',
-    install_dir : get_option('prefix') / 'lib/modules-load.d'
-)
